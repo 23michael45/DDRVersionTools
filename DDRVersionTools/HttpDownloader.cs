@@ -44,6 +44,9 @@ namespace DDRVersionTools
 
                 client.DownloadProgressChanged += OnDownloadProgressChanged;
                 client.DownloadFileCompleted += OnDownloadFileCompleted;
+
+                CreateDirectoryRecursively(filename);
+
                 client.DownloadFileAsync(new Uri(url), filename);
 
                 while(!bComplete)
@@ -69,7 +72,56 @@ namespace DDRVersionTools
         public void OnDownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
         {
             bComplete = true;
-            Console.WriteLine(string.Format("Downloading Complete"));
+            if(e.Error != null)
+            {
+
+                Console.WriteLine(string.Format("Downloading Error : {0}",e.Error.ToString()) );
+            }
+            else
+            {
+                Console.WriteLine(string.Format("Downloading Complete"));
+
+            }
+        }
+
+
+
+        public bool CreateDirectoryRecursively(string path)
+        {
+            try
+            {
+                path = path.Replace("/", "\\");
+
+                string[] pathParts = path.Split('\\');
+                for (var i = 0; i < pathParts.Length; i++)
+                {
+                    // Correct part for drive letters
+                    if (i == 0 && pathParts[i].Contains(":"))
+                    {
+                        pathParts[i] = pathParts[i] + "\\";
+                    } // Do not try to create last part if it has a period (is probably the file name)
+                    else if (i == pathParts.Length - 1 && pathParts[i].Contains("."))
+                    {
+                        return true;
+                    }
+                    if (i > 0)
+                    {
+                        pathParts[i] = Path.Combine(pathParts[i - 1], pathParts[i]);
+                    }
+                    if (!Directory.Exists(pathParts[i]))
+                    {
+                        Directory.CreateDirectory(pathParts[i]);
+                    }
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+
+            }
+
         }
     }
 }
