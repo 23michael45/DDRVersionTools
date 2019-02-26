@@ -8,11 +8,13 @@ using System.Runtime.Serialization;
 
 using LitJson;
 using ConfigurationParser;
+using System.Diagnostics;
 
 namespace DDRVersionTools
 {
     public class Program
     {
+        public static string m_Heading = "下载设置";
         public static string m_HttpAddr;
         public static string m_AppName;
         public static string m_DebugMode;
@@ -21,18 +23,22 @@ namespace DDRVersionTools
         public static string m_LargeFilePath;
         public static string m_SeqFilePath;
 
+        public static string m_CurrentVersion;
+        public static Parser m_ConfigParser;
+
         static void Main(string[] args)
         {
-            var parser = new Parser("Config.dat");
-            string heading = "下载设置";
-            m_HttpAddr = parser.GetString(heading, "服务器地址");
+            m_ConfigParser = new Parser("Config.dat");
+            m_HttpAddr = m_ConfigParser.GetString(m_Heading, "服务器地址");
             m_HttpAddr = m_HttpAddr.TrimEnd('/');
-            m_AppName = parser.GetString(heading, "程序名");
-            m_DebugMode = parser.GetString(heading, "调试模式");
+            m_AppName = m_ConfigParser.GetString(m_Heading, "程序名");
+            m_DebugMode = m_ConfigParser.GetString(m_Heading, "调试模式");
 
-            m_LargeFileName = parser.GetString(heading, "大文件表文件");
-            m_LargeFilePath = parser.GetString(heading, "大文件路径");
-            m_SeqFilePath = parser.GetString(heading, "流程文件路径");
+            m_LargeFileName = m_ConfigParser.GetString(m_Heading, "大文件表文件");
+            m_LargeFilePath = m_ConfigParser.GetString(m_Heading, "大文件路径");
+            m_SeqFilePath = m_ConfigParser.GetString(m_Heading, "流程文件路径");
+
+            m_CurrentVersion = m_ConfigParser.GetString(m_Heading, "当前版本");
 
 
 
@@ -126,8 +132,11 @@ namespace DDRVersionTools
                 string path = client.DownloadString(url);
                 string[] vers = path.Split('\n');
 
+
+                Console.Write("\n当前版本:" + m_CurrentVersion);
+
                 int i = 0;
-                Console.Write("\n当前可用版本");
+                Console.Write("\n当前可用版本:");
 
                 for (i = 0; i < vers.Length;i++)
                 {
@@ -181,6 +190,15 @@ namespace DDRVersionTools
         {
             try
             {
+                string[] currentFiles = Directory.GetFiles(Directory.GetCurrentDirectory(),"*.*", SearchOption.AllDirectories);
+                List<string> curFileList = new List<string>();
+                List<string> newverFileList = new List<string>();
+                foreach (string f in currentFiles)
+                {
+                    curFileList.Add(f.Replace(Directory.GetCurrentDirectory(), "").Trim('\\').Replace("\\","/").Replace("//", "/").Trim('/'));
+                }
+
+
 
                 string url = m_HttpAddr + "/" + m_AppName + "/" + m_DebugMode + "/" + version;
 
@@ -199,7 +217,7 @@ namespace DDRVersionTools
                     string relativeDir = ls[1];
 
                     CheckMd5Dwonload(url, fileName, relativeDir);
-
+                    newverFileList.Add((relativeDir.Trim('\\').Replace("\\", "/") + "/" + fileName).Replace("//", "/").Trim('/'));
                 }
 
 
@@ -225,11 +243,81 @@ namespace DDRVersionTools
                         string largeFileUrl = m_HttpAddr + "/" + m_AppName + "/" + m_DebugMode + "/" + m_LargeFilePath;
 
                         CheckMd5Dwonload(largeFileUrl, fileName, relativeDir);
+                        newverFileList.Add((relativeDir.Trim('\\').Replace("\\", "/") + "/" + fileName).Replace("//", "/").Trim('/'));
                     }
 
                 }
 
 
+
+
+
+                int curVer = 0;
+                if (m_CurrentVersion != "Base")
+                {
+                    int lastp = m_CurrentVersion.LastIndexOf('.');
+                    string scurVer = m_CurrentVersion.Substring(lastp, m_CurrentVersion.Length - lastp);
+                    curVer = Convert.ToInt32(scurVer);
+                }
+
+
+                string seqUrl = m_HttpAddr + "/" + m_AppName + "/" + m_DebugMode + "/" + m_SeqFilePath;
+
+
+                string jseqfilelist;
+                using (var client = new WebClient())
+                {
+                    jseqfilelist = client.DownloadString(seqUrl);
+                }
+
+                List<List<string>> seqfileList = JsonMapper.ToObject<List<List<string>>>(jseqfilelist);
+
+                foreach (var ls in seqfileList)
+                {
+                    string fileName = ls[0];
+                    string relativeDir = ls[1];
+
+
+
+                    CheckMd5Dwonload(seqUrl, fileName, relativeDir);
+
+                    int last_ = fileName.LastIndexOf('_') + 1;
+                    string sseqVer = fileName.Substring(last_ ,fileName.Length - last_ - 4);//-4 is delete ".exe"
+                    int seqVer = Convert.ToInt32(sseqVer);
+
+                    if(seqVer > curVer)
+                    {
+                        string temp = relativeDir.Trim('\\').Trim('/');
+                        string exePath = Directory.GetCurrentDirectory() + "/" + temp + "/" + fileName;
+                        if(File.Exists(exePath))
+                        {
+                            var process = Process.Start(exePath);
+                            process.WaitForExit();
+
+                            Console.WriteLine("\nRun:" + fileName);
+                        }
+                        else
+                        {
+                            Console.WriteLine("\nFile Not Exist:" + exePath);
+                        }
+                    }
+
+
+
+                }
+
+                foreach(string curF in curFileList)
+                {
+                    if(!newverFileList.Contains(curF) && !curF.Contains("DDRVersionTools.exe") && !curF.Contains("Config.dat") && !curF.Contains("DDRVersionTools.pdb"))
+                    {
+                        File.Delete(curF);
+
+                        Console.WriteLine("\nDelete File:" + curF);
+                    }
+                }
+
+
+                m_ConfigParser.SetString(m_Heading, "当前版本",version);
             }
             catch (Exception e)
             {
