@@ -40,6 +40,11 @@ namespace DDRVersionTools
 
             m_CurrentVersion = m_ConfigParser.GetString(m_Heading, "当前版本");
 
+            if(args.Length == 0)
+            {
+                args = new string[1];
+                args[0] = "cmdline";
+            }
 
 
             if (args[0] == "compile-time")
@@ -62,7 +67,7 @@ namespace DDRVersionTools
                     Console.WriteLine("\n----------------------------------------------------------------------------------------------------------------------");
                     Console.WriteLine("----------------------------------------------------------------------------------------------------------------------");
                     Console.WriteLine("请输入指令:");
-                    Console.WriteLine("   version                               显示当前版本 最新版本及可升级版本 addr为服务器地址 mode为副目录地址");
+                    Console.WriteLine("   version                               显示当前版本 最新版本及可升级版本");
                     Console.WriteLine("   upgrade [v]                           升级到版本v");
 
                     Console.WriteLine("   quit                                  退出");
