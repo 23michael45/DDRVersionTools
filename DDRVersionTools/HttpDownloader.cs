@@ -12,6 +12,7 @@ namespace DDRVersionTools
     class HttpDownloader
     {
         bool bComplete = false;
+        float progress = 0;
 
         //string basePath = "http://111.230.250.213:8000/Distribution/";    mode->"Debug or Release"
         public void DownloadRecent(string basePath,string filename,string mode = "Debug")
@@ -40,13 +41,14 @@ namespace DDRVersionTools
         {
             using (var client = new WebClient())
             {
-                Console.WriteLine(string.Format("Downloading: {0}", url));
+                Console.Write(string.Format("\nDownloading: {0} ", url));
 
                 client.DownloadProgressChanged += OnDownloadProgressChanged;
                 client.DownloadFileCompleted += OnDownloadFileCompleted;
 
                 CreateDirectoryRecursively(filename);
 
+                progress = 0;
                 client.DownloadFileAsync(new Uri(url), filename);
 
                 while(!bComplete)
@@ -67,7 +69,13 @@ namespace DDRVersionTools
 
             double percentage = bytesIn / totalBytes * 100;
 
-            Console.WriteLine(string.Format("Downloaded {0} of {1}  Progress: {2}", e.BytesReceived,e.TotalBytesToReceive, percentage));
+            //Console.WriteLine(string.Format("Downloaded {0} of {1}  Progress: {2}", e.BytesReceived,e.TotalBytesToReceive, percentage));
+            if(percentage - progress > 5)
+            {
+                progress += 5;
+                Console.Write("#");
+
+            }
         }
         public void OnDownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
         {
@@ -79,7 +87,7 @@ namespace DDRVersionTools
             }
             else
             {
-                Console.WriteLine(string.Format("Downloading Complete"));
+                Console.Write(string.Format("Complete"));
 
             }
         }
