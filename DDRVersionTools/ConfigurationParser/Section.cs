@@ -16,7 +16,12 @@ namespace ConfigurationParser
 
         public string GetString(string key)
         {
-            return this[key];
+            if (this.ContainsKey(key))
+            {
+                return this[key];
+
+            }
+            return "";
         }
 
         public int GetInt(string key)

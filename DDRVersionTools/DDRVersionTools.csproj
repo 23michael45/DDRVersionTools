@@ -50,6 +50,7 @@
     <Compile Include="ConfigurationParser\Parser.cs" />
     <Compile Include="ConfigurationParser\Section.cs" />
     <Compile Include="ConfigurationParser\SectionParser.cs" />
+    <Compile Include="ConsoleWindow.cs" />
     <Compile Include="HttpDownloader.cs" />
     <Compile Include="LitJson\IJsonWrapper.cs" />
     <Compile Include="LitJson\JsonData.cs" />

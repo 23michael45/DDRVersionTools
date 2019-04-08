@@ -9,6 +9,7 @@ using System.Runtime.Serialization;
 using LitJson;
 using ConfigurationParser;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace DDRVersionTools
 {
@@ -17,8 +18,10 @@ namespace DDRVersionTools
 
         static void Main(string[] args)
         {
-           
-            if(args.Length == 0)
+
+            ConsoleWindow.QuickEditMode(false);
+
+            if (args.Length == 0)
             {
                 args = new string[1];
                 args[0] = "cmdline";
@@ -42,6 +45,7 @@ namespace DDRVersionTools
                 bool quit = false;
                 do
                 {
+                    Console.WriteLine("\nDDR版本更新工具v1.0");
                     Console.WriteLine("\n----------------------------------------------------------------------------------------------------------------------");
                     Console.WriteLine("----------------------------------------------------------------------------------------------------------------------");
                     Console.WriteLine("请输入指令:");

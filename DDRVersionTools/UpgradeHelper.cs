@@ -23,11 +23,16 @@ namespace DDRVersionTools
         public static string m_LargeFilePath;
         public static string m_SeqFilePath;
 
+        public static string m_IgnoreFileName;
+        public static string m_IgnoreFilePath;
+
         public string m_CurrentVersion;
         List<string> m_BaseFileList = new List<string>();
         List<string> m_CurFileList = new List<string>();
         List<string> m_NewverFileList = new List<string>();
-        List<string> mSeqwFileList = new List<string>();
+        List<string> m_SeqwFileList = new List<string>();
+        List<string> m_IgnoreFileList = new List<string>();
+
 
         public UpgradeHelper()
         {
@@ -40,6 +45,9 @@ namespace DDRVersionTools
             m_LargeFileName = m_ConfigParser.GetString(m_Heading, "大文件表文件");
             m_LargeFilePath = m_ConfigParser.GetString(m_Heading, "大文件路径");
             m_SeqFilePath = m_ConfigParser.GetString(m_Heading, "流程文件路径");
+
+
+            m_IgnoreFileName = m_ConfigParser.GetString(m_Heading, "忽略检查文件表文件");
 
             m_CurrentVersion = m_ConfigParser.GetString(m_Heading, "当前版本");
 
@@ -55,6 +63,11 @@ namespace DDRVersionTools
         {
             try
             {
+                if(fileName.Contains("VersionTools"))
+                {
+                    Console.WriteLine("VersionTools File Check");
+                }
+
                 if (File.Exists(fileName))
                 {
 
@@ -184,10 +197,15 @@ namespace DDRVersionTools
                     string relativeDir = ls[1];
 
                     string f = relativeDir + "/" + fileName;
+                    f = f.Trim('\\').Replace("\\", "/").Replace("//", "/").Trim('/');
+                    if (m_IgnoreFileList.Contains(f) && File.Exists(f))
+                    {
+                        continue;
+                    }
 
                     CheckExistDwonload(url, fileName, relativeDir);
 
-                    m_BaseFileList.Add(f.Trim('\\').Replace("\\", "/").Replace("//", "/").Trim('/'));
+                    m_BaseFileList.Add(f);
                 }
 
                 return true;
@@ -199,23 +217,12 @@ namespace DDRVersionTools
 
         }
 
-        bool DownloadVersionFiles(ref string version)
+        bool DownloadVersionFiles(string version)
         {
             try
             {
 
                 Console.WriteLine("\n正在下载版本文件");
-                if (string.IsNullOrEmpty(version))
-                {
-
-                    string urlVerList = m_HttpAddr + "/" + m_AppName + "/" + m_DebugMode + @".txt";
-                    using (var client = new WebClient())
-                    {
-                        string path = client.DownloadString(urlVerList);
-                        string[] vers = path.Split('\n');
-                        version = vers[vers.Length - 1];
-                    }
-                }
                 string url = m_HttpAddr + "/" + m_AppName + "/" + m_DebugMode + "/" + version;
 
 
@@ -245,6 +252,70 @@ namespace DDRVersionTools
                 return false;
             }
 
+        }
+        void FillIgnoreFiles(ref string version)
+        {
+            try
+            {
+
+                Console.WriteLine("\n正在检查版本信息");
+                if (string.IsNullOrEmpty(version))
+                {
+
+                    string urlVerList = m_HttpAddr + "/" + m_AppName + "/" + m_DebugMode + @".txt";
+                    using (var client = new WebClient())
+                    {
+                        string path = client.DownloadString(urlVerList);
+                        string[] vers = path.Split('\n');
+                        version = vers[vers.Length - 1];
+                    }
+                }
+
+                if (string.IsNullOrEmpty(m_IgnoreFileName))
+                {
+                    return;
+                }
+
+
+                string url = m_HttpAddr + "/" + m_AppName + "/" + m_DebugMode + "/" + version + "/";
+
+
+
+                Console.WriteLine("\n正在下载忽略检查列表:" + version + "/" + m_IgnoreFileName);
+
+
+                CheckMd5Dwonload(url, m_IgnoreFileName, "");
+
+
+                Console.WriteLine("\n正在读取忽略检查文件列表");
+                if (File.Exists(m_IgnoreFileName))
+                {
+
+                    string ignoreFileTxt = File.ReadAllText(m_IgnoreFileName);
+                    string[] ignoreFiles = ignoreFileTxt.Split('\n');
+                    for (int i = 0; i < ignoreFiles.Length; i++)
+                    {
+                        var temp = ignoreFiles[i].Trim();
+                        temp = temp.Replace("\\", "/");
+                        temp = temp.Replace("//", "/");
+                        temp = temp.Replace(m_DebugMode + "/" + m_LargeFilePath, "");
+                        ignoreFiles[i] = temp;
+                        Console.WriteLine(ignoreFiles[i]);
+                        
+                        m_IgnoreFileList.Add((ignoreFiles[i].Trim('\\').Replace("\\", "/")).Replace("//", "/").Trim('/'));
+                    }
+
+                }
+
+                
+            }
+            catch (Exception e)
+            {
+
+                Console.WriteLine("\nLoadIgnoreFiles Error:" + e.Message);
+
+                return ;
+            }
         }
 
         bool DownloadLargeFiles()
@@ -347,7 +418,7 @@ namespace DDRVersionTools
 
                     CheckMd5Dwonload(seqUrl, fileName, relativeDir);
 
-                    mSeqwFileList.Add((relativeDir.Trim('\\').Replace("\\", "/") + "/" + fileName).Replace("//", "/").Trim('/'));
+                    m_SeqwFileList.Add((relativeDir.Trim('\\').Replace("\\", "/") + "/" + fileName).Replace("//", "/").Trim('/'));
   
 
 
@@ -399,11 +470,15 @@ namespace DDRVersionTools
                     {
                         continue;
                     }
+                    if (m_IgnoreFileList.Contains(curF))
+                    {
+                        continue;
+                    }
                     if (curF.Contains("OneRoute"))
                     {
                         continue;
                     }
-                    if (mSeqwFileList.Contains(curF))
+                    if (m_SeqwFileList.Contains(curF))
                     {
                         continue;
                     }
@@ -448,12 +523,19 @@ namespace DDRVersionTools
         {
             try
             {
+
+                FillIgnoreFiles(ref version);
+
+
                 bool ret = true;
                 ret = FillCurList();
                 if (!ret) return;
 
-                ret = DownloadVersionFiles(ref version);
+
+                ret = DownloadVersionFiles(version);
                 if (!ret) return;
+
+
                 ret = DownloadLargeFiles();
                 if (!ret) return;
                 ret = DownloadSeqFilesAndRun();
