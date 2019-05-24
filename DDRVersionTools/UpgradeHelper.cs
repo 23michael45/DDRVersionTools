@@ -241,6 +241,13 @@ namespace DDRVersionTools
                     string fileName = ls[0];
                     string relativeDir = ls[1];
 
+                    string f = relativeDir + "/" + fileName;
+                    f = f.Trim('\\').Replace("\\", "/").Replace("//", "/").Trim('/');
+                    if (m_IgnoreFileList.Contains(f) && File.Exists(f))
+                    {
+                        continue;
+                    }
+
                     CheckMd5Dwonload(url, fileName, relativeDir);
                     m_NewverFileList.Add((relativeDir.Trim('\\').Replace("\\", "/") + "/" + fileName).Replace("//", "/").Trim('/'));
                 }

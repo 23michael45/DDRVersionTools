@@ -32,6 +32,10 @@ namespace DDRVersionTools
             {
                 CompileTime(args);
             }
+            else if (args[0] == "compile-time-cs")
+            {
+                CompileTimeCS(args);
+            }
             else if (args[0] == "download-recent")
             {
                 DownloadRecent(args);
@@ -51,6 +55,7 @@ namespace DDRVersionTools
                     Console.WriteLine("请输入指令:");
                     Console.WriteLine("   v                                     显示当前版本 最新版本及可升级版本");
                     Console.WriteLine("   u [ver]                               升级到版本ver  ver为空则升级到最新版本");
+                    Console.WriteLine("   b                                     查看工具版本");
 
                     Console.WriteLine("   quit                                  退出");
 
@@ -75,10 +80,14 @@ namespace DDRVersionTools
                         Upgrade(cmdargs[1]);
 
                     }
+                    else if (cmd.StartsWith("b"))
+                    {
+
+                        Console.Write("\n当前工具版本:" + Version.BuildTime);
+                    }
 
 
-
-                } while (!quit);
+                    } while (!quit);
 
             }
         }
@@ -91,6 +100,13 @@ namespace DDRVersionTools
             VersionWriter vw = new VersionWriter();
             vw.WriteTime(filename, linenum);
 
+        }
+        static void CompileTimeCS(string[] args)
+        {
+            string filename = args[1];
+            int linenum = Convert.ToInt32(args[2]);
+            VersionWriter vw = new VersionWriter();
+            vw.WriteTimeCS(filename, linenum);
         }
 
         //DDRVersionTools download-recent http://111.230.250.213:8000/Distribution/ DDR_LocalServer.exe Debug
