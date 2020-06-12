@@ -221,8 +221,10 @@ namespace DDRVersionTools
         {
             try
             {
+                string progressName = "\n正在下载版本文件";
+                AsyncServer.Instance.SetProgress(progressName, 0);
 
-                Console.WriteLine("\n正在下载版本文件");
+                Console.WriteLine(progressName);
                 string url = m_HttpAddr + "/" + m_AppName + "/" + m_DebugMode + "/" + version;
 
 
@@ -236,6 +238,7 @@ namespace DDRVersionTools
 
                 List<List<string>> fileList = JsonMapper.ToObject<List<List<string>>>(jfilelist);
 
+                float index = 0;
                 foreach (var ls in fileList)
                 {
                     string fileName = ls[0];
@@ -250,6 +253,9 @@ namespace DDRVersionTools
 
                     CheckMd5Dwonload(url, fileName, relativeDir);
                     m_NewverFileList.Add((relativeDir.Trim('\\').Replace("\\", "/") + "/" + fileName).Replace("//", "/").Trim('/'));
+
+                    index++;
+                    AsyncServer.Instance.SetProgress(progressName, index / fileList.Count);
                 }
                 return true;
             }
@@ -334,13 +340,17 @@ namespace DDRVersionTools
                     return true;
                 }
 
+                string progressName = "\n正在下载大容量文件";
+                AsyncServer.Instance.SetProgress(progressName, 0);
 
-                Console.WriteLine("\n正在下载大容量文件");
+                Console.WriteLine(progressName);
                 if (File.Exists(m_LargeFileName))
                 {
 
                     string largeFileTxt = File.ReadAllText(m_LargeFileName);
                     string[] largeFiles = largeFileTxt.Split('\n');
+
+                    float index = 0;
                     for (int i = 0; i < largeFiles.Length; i++)
                     {
                         var temp = largeFiles[i].Trim();
@@ -359,6 +369,10 @@ namespace DDRVersionTools
 
                         CheckMd5Dwonload(largeFileUrl, fileName, relativeDir);
                         m_NewverFileList.Add((relativeDir.Trim('\\').Replace("\\", "/") + "/" + fileName).Replace("//", "/").Trim('/'));
+
+
+                        index++;
+                        AsyncServer.Instance.SetProgress(progressName, index / largeFiles.Length);
                     }
 
                 }
@@ -552,25 +566,28 @@ namespace DDRVersionTools
                 ret = WriteNewVersion(version);
                 if (!ret) return;
 
+                AsyncServer.Instance.SetProgress("Idle", 0);
             }
             catch (Exception e)
             {
                 Console.Write(e.Message);
+
+                AsyncServer.Instance.SetProgress("Idle",0);
             }
 
 
 
         }
 
-        public void ShowVersion()
+        public void ShowVersion(out string baseVersion,out string latestVersion,out string[] vers,out string currentVersion)
         {
             string url = m_HttpAddr + "/" + m_AppName + "/" + m_DebugMode + @".txt";
             using (var client = new WebClient())
             {
                 string path = client.DownloadString(url);
-                string[] vers = path.Split('\n');
+                vers = path.Split('\n');
 
-
+                currentVersion = m_CurrentVersion;
                 Console.Write("\n当前版本:" + m_CurrentVersion);
 
                 int i = 0;
@@ -582,12 +599,12 @@ namespace DDRVersionTools
                     Console.Write("\n     " + vers[i]);
                 }
 
-                string baseVersion = vers[0];
-                string currentVersion = vers[vers.Length - 1];
+                baseVersion = vers[0];
+                latestVersion = vers[vers.Length - 1];
 
 
                 Console.Write("\n基础版本:" + baseVersion);
-                Console.Write("\n最新版本:" + currentVersion);
+                Console.Write("\n最新版本:" + latestVersion);
 
             }
         }

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
-
+using LitJson;
 namespace DDRVersionTools
 {
     class HttpDownloader
@@ -130,6 +130,140 @@ namespace DDRVersionTools
 
             }
 
+        }
+    }
+
+
+
+    public class AsyncServer
+    {
+        public static AsyncServer Instance;
+        public class VersionJson
+        {
+            public string baseVersion { get; set; }
+            public string latestVersion { get; set; }
+            public string[] vers { get; set; }
+            public string currentVersion { get; set; }
+        }
+
+        private static Mutex ProgressMutex = new Mutex();
+        public class ProgressJson
+        {
+
+            public string ProgressName { get; set; }
+            public double Progress { get; set; }
+        }
+        ProgressJson currentProgress = new ProgressJson();
+
+        public void SetProgress(string name,double value)
+        {
+            ProgressMutex.WaitOne();
+            currentProgress.ProgressName = name;
+            currentProgress.Progress = value;
+            ProgressMutex.ReleaseMutex();
+        }
+
+
+        HttpListener listener;
+        bool working = true;
+        public AsyncServer()
+        {
+            Instance = this;
+            Thread thread1 = new Thread(ThreadFunc);
+            thread1.Start();
+
+            AsyncServer.Instance.SetProgress("Idle", 0);
+            working = true;
+        }
+        public void Stop()
+        {
+            working = false;
+        }
+
+        void ThreadFunc()
+        {
+            listener = new HttpListener();
+
+            listener.Prefixes.Add("http://localhost:8081/");
+            listener.Prefixes.Add("http://127.0.0.1:8081/");
+
+            listener.Start();
+            while (working)
+            {
+                try
+                {
+                    var context = listener.GetContext();
+                    ThreadPool.QueueUserWorkItem(o => HandleRequest(context));
+                }
+                catch (Exception)
+                {
+                    // Ignored for this example
+                }
+            }
+
+            listener.Close();
+        }
+
+
+        private void HandleRequest(object state)
+        {
+            try
+            {
+                var context = (HttpListenerContext)state;
+
+                context.Response.StatusCode = 200;
+                context.Response.SendChunked = true;
+
+                int totalTime = 0;
+
+
+                if(context.Request.RawUrl == "/ver")
+                {
+                    UpgradeHelper helper = new UpgradeHelper();
+                    string baseVersion;
+                    string latestVersion;
+                    string[] vers;
+                    string currentVersion;
+                    helper.ShowVersion(out baseVersion, out latestVersion, out vers, out currentVersion);
+
+
+
+
+                    VersionJson json = new VersionJson();
+                    json.baseVersion = baseVersion;
+                    json.latestVersion = latestVersion;
+                    json.vers = vers;
+                    json.currentVersion = currentVersion;
+
+                    string jsonString;
+                    jsonString = JsonMapper.ToJson(json);
+
+                    var data = Encoding.UTF8.GetBytes(jsonString);
+                    context.Response.OutputStream.Write(data, 0, data.Length);
+                }
+                else if (context.Request.RawUrl == "/upgrade")
+                {
+                    UpgradeHelper helper = new UpgradeHelper();
+                    helper.Upgrade("");
+
+                    var data = Encoding.UTF8.GetBytes("Launched");
+                    context.Response.OutputStream.Write(data, 0, data.Length);
+                }
+                else if (context.Request.RawUrl == "/progress")
+                {
+                    string jsonString;
+                    jsonString = JsonMapper.ToJson(currentProgress);
+                    var data = Encoding.UTF8.GetBytes(jsonString);
+                    context.Response.OutputStream.Write(data, 0, data.Length);
+                }
+
+                context.Response.OutputStream.Close();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                // Client disconnected or some other error - ignored for this example
+            }
         }
     }
 }

@@ -19,7 +19,13 @@ namespace DDRVersionTools
         static void Main(string[] args)
         {
 
+
             ConsoleWindow.QuickEditMode(false);
+
+
+            AsyncServer server = new AsyncServer();
+
+
 
             if (args.Length == 0)
             {
@@ -131,7 +137,12 @@ namespace DDRVersionTools
         {
 
             UpgradeHelper helper = new UpgradeHelper();
-            helper.ShowVersion();
+
+            string baseVersion;
+            string latestVersion;
+            string[] vers;
+            string currentVersion;
+            helper.ShowVersion(out baseVersion,out latestVersion,out vers,out currentVersion);
         }
 
 
