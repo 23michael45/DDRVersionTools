@@ -50,6 +50,10 @@ namespace DDRVersionTools
             {
                 DownloadRecent(args);
             }
+            else if (args[0] == "upgrade")
+            {
+                Upgrade("");
+            }
             else if (args[0] == "cmdline")
             {
                 bool quit = false;

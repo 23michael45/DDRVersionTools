@@ -19,7 +19,13 @@ namespace DDRVersionTools
         static void Main(string[] args)
         {
 
-            // ConsoleWindow.QuickEditMode(false);
+
+            //ConsoleWindow.QuickEditMode(false);
+
+
+            AsyncServer server = new AsyncServer();
+
+
 
             if (args.Length == 0)
             {
@@ -43,6 +49,10 @@ namespace DDRVersionTools
             else if (args[0] == "download-file")
             {
                 DownloadRecent(args);
+            }
+            else if (args[0] == "upgrade")
+            {
+                Upgrade("");
             }
             else if (args[0] == "cmdline")
             {
@@ -131,7 +141,12 @@ namespace DDRVersionTools
         {
 
             UpgradeHelper helper = new UpgradeHelper();
-            helper.ShowVersion();
+
+            string baseVersion;
+            string latestVersion;
+            string[] vers;
+            string currentVersion;
+            helper.ShowVersion(out baseVersion,out latestVersion,out vers,out currentVersion);
         }
 
 
