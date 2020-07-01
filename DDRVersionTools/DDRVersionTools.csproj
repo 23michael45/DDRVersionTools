@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>DDRVersionTools</RootNamespace>
     <AssemblyName>DDRVersionTools</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
@@ -50,6 +50,9 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -79,12 +82,19 @@
     <Compile Include="LitJson\ParserToken.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TinyWeb\HttpRequest.cs" />
+    <Compile Include="TinyWeb\HttpResponse.cs" />
+    <Compile Include="TinyWeb\SocketUtility.cs" />
+    <Compile Include="TinyWeb\WebServer.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="UpgradeHelper.cs" />
     <Compile Include="Version.cs" />
     <Compile Include="VersionWriter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="app.manifest" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">

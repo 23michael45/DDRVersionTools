@@ -7,6 +7,8 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using LitJson;
+using TinyWeb;
+
 namespace DDRVersionTools
 {
     class HttpDownloader
@@ -182,28 +184,81 @@ namespace DDRVersionTools
 
         void ThreadFunc()
         {
-            listener = new HttpListener();
+            //listener = new HttpListener();
 
-            listener.Prefixes.Add("http://localhost:8081/");
-            listener.Prefixes.Add("http://127.0.0.1:8081/");
+            ////listener.Prefixes.Add("http://+:8081/");
+            //listener.Prefixes.Add("http://localhost:8081/");
+            //listener.Prefixes.Add("http://127.0.0.1:8081/");
 
-            listener.Start();
-            while (working)
-            {
-                try
-                {
-                    var context = listener.GetContext();
-                    ThreadPool.QueueUserWorkItem(o => HandleRequest(context));
-                }
-                catch (Exception)
-                {
-                    // Ignored for this example
-                }
-            }
+            //listener.Start();
+            //while (working)
+            //{
+            //    try
+            //    {
+            //        var context = listener.GetContext();
+            //        ThreadPool.QueueUserWorkItem(o => HandleRequest(context));
+            //    }
+            //    catch (Exception)
+            //    {
+            //        // Ignored for this example
+            //    }
+            //}
 
-            listener.Close();
+            //listener.Close();
+
+
+
+            TinyWeb.WebServer webServer = new TinyWeb.WebServer();
+
+            webServer.EndPoint = new IPEndPoint(0, 8081);
+            webServer.ProcessRequest += new TinyWeb.ProcessRequestEventHandler(this.webServer_ProcessRequest);
+            webServer.IsStarted = true;
         }
 
+        void webServer_ProcessRequest(object sender, ProcessRequestEventArgs args)
+        {
+            string cmd = args.Request.Path;
+            if (cmd == "/ver")
+            {
+                UpgradeHelper helper = new UpgradeHelper();
+                string baseVersion;
+                string latestVersion;
+                string[] vers;
+                string currentVersion;
+                helper.ShowVersion(out baseVersion, out latestVersion, out vers, out currentVersion);
+
+
+
+
+                VersionJson json = new VersionJson();
+                json.baseVersion = baseVersion;
+                json.latestVersion = latestVersion;
+                json.vers = vers;
+                json.currentVersion = currentVersion;
+
+                string jsonString;
+                jsonString = JsonMapper.ToJson(json);
+
+                var data = Encoding.UTF8.GetBytes(jsonString);
+                args.Response.BinaryWrite(data);
+            }
+            else if (cmd == "/upgrade")
+            {
+                UpgradeHelper helper = new UpgradeHelper();
+                helper.Upgrade("");
+
+                var data = Encoding.UTF8.GetBytes("Launched");
+                args.Response.BinaryWrite(data);
+            }
+            else if (cmd == "/progress")
+            {
+                string jsonString;
+                jsonString = JsonMapper.ToJson(currentProgress);
+                var data = Encoding.UTF8.GetBytes(jsonString);
+                args.Response.BinaryWrite(data);
+            }
+            
+        }
 
         private void HandleRequest(object state)
         {
