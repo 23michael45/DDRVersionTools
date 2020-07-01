@@ -1,4 +1,6 @@
-﻿using ConfigurationParser;
+﻿#define Linux_
+
+using ConfigurationParser;
 using LitJson;
 using System;
 using System.Collections.Generic;
@@ -556,10 +558,38 @@ namespace DDRVersionTools
         }
 
 
+
+        static void RunCmd(string cmdinput)
+        {
+            Process cmd = new Process();
+#if Linux
+            cmd.StartInfo.FileName = "/bin/bash";
+#else
+            cmd.StartInfo.FileName = "cmd.exe";
+#endif
+            cmd.StartInfo.RedirectStandardInput = true;
+            cmd.StartInfo.RedirectStandardOutput = true;
+            cmd.StartInfo.CreateNoWindow = true;
+            cmd.StartInfo.UseShellExecute = false;
+            cmd.Start();
+
+            cmd.StandardInput.WriteLine(cmdinput);
+            cmd.StandardInput.Flush();
+            cmd.StandardInput.Close();
+            cmd.WaitForExit();
+            Console.WriteLine(cmd.StandardOutput.ReadToEnd());
+        }
+
+
         public void Upgrade(string version)
         {
             try
             {
+#if Linux
+                RunCmd("./PreUpgrade.sh");
+#else
+                RunCmd("PreUpgrade.bat");
+#endif
 
                 FillIgnoreFiles(ref version);
 
@@ -583,6 +613,13 @@ namespace DDRVersionTools
                 if (!ret) return;
 
                 AsyncServer.Instance.SetProgress("Idle", 0);
+
+
+#if Linux
+                RunCmd("./PostUpgrade.sh");
+#else
+                RunCmd("PostUpgrade.bat");
+#endif
             }
             catch (Exception e)
             {

@@ -95,9 +95,12 @@ namespace DDRVersionTools
 
                         Console.Write("\n当前工具版本:" + Version.BuildTime);
                     }
+                    else if (cmd.StartsWith("t"))
+                    {
 
+                    }
 
-                    } while (!quit);
+                } while (!quit);
 
             }
         }
@@ -157,9 +160,6 @@ namespace DDRVersionTools
            
             
         }
-
-
-
 
 
     }
