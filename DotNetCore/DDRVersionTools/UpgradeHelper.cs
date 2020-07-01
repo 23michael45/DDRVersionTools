@@ -166,8 +166,10 @@ namespace DDRVersionTools
             try
             {
 
+                string progressName = "\n正在查询本地文件";
+                AsyncServer.Instance.SetProgress(progressName, 0);
 
-                Console.WriteLine("\n正在查询本地文件");
+                Console.WriteLine(progressName);
                 string[] currentFiles = Directory.GetFiles(Directory.GetCurrentDirectory(), "*.*", SearchOption.AllDirectories);
 
                 foreach (string f in currentFiles)
@@ -177,8 +179,9 @@ namespace DDRVersionTools
                 }
 
 
-
-                Console.WriteLine("\n正在查询基础版本文件");
+                progressName = "\n正在查询基础版本文件";
+                AsyncServer.Instance.SetProgress(progressName, 0);
+                Console.WriteLine(progressName);
 
                 string url = m_HttpAddr + "/" + m_AppName + "/" + m_DebugMode + "/" + "Base";
 
@@ -191,6 +194,12 @@ namespace DDRVersionTools
 
                 List<List<string>> fileList = JsonMapper.ToObject<List<List<string>>>(jfilelist);
 
+
+
+                progressName = "\n下载缺失文件";
+                AsyncServer.Instance.SetProgress(progressName, 0);
+
+                float i = 0;
                 foreach (var ls in fileList)
                 {
                     string fileName = ls[0];
@@ -203,9 +212,14 @@ namespace DDRVersionTools
                         continue;
                     }
 
+
+                    AsyncServer.Instance.SetProgress(progressName, i / fileList.Count);
+
                     CheckExistDwonload(url, fileName, relativeDir);
 
                     m_BaseFileList.Add(f);
+
+                    i+=1;
                 }
 
                 return true;
@@ -270,8 +284,10 @@ namespace DDRVersionTools
         {
             try
             {
+                string progressName = "\n正在检查版本信息";
+                AsyncServer.Instance.SetProgress(progressName, 0);
 
-                Console.WriteLine("\n正在检查版本信息");
+                Console.WriteLine(progressName);
                 if (string.IsNullOrEmpty(version))
                 {
 

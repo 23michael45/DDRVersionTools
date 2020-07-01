@@ -7,6 +7,6 @@ namespace DDRVersionTools
 {
     class Version
     {
-        public static string BuildTime = "2020/6/12 11:20:01";
+        public static string BuildTime = "2020/7/1 11:17:15";
     }
 }
