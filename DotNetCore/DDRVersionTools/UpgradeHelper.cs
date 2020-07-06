@@ -456,6 +456,7 @@ namespace DDRVersionTools
                     string relativeDir = ls[1];
 
 
+                    Console.WriteLine("\nDownloadSeqFilesAndRun in seqfileList :" + relativeDir + " " + fileName);
 
                     CheckMd5Dwonload(seqUrl, fileName, relativeDir);
 
