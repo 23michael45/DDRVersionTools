@@ -441,6 +441,8 @@ namespace DDRVersionTools
 
 
                 string jseqfilelist;
+
+                Console.WriteLine("\nDownloadSeqFilesAndRun :" + seqUrl);
                 using (var client = new WebClient())
                 {
                     jseqfilelist = client.DownloadString(seqUrl);
