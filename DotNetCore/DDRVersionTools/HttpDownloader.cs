@@ -244,6 +244,7 @@ namespace DDRVersionTools
             }
             else if (cmd == "/upgrade")
             {
+                
                 UpgradeHelper helper = new UpgradeHelper();
                 helper.Upgrade("");
 
@@ -298,8 +299,12 @@ namespace DDRVersionTools
                 }
                 else if (context.Request.RawUrl == "/upgrade")
                 {
-                    UpgradeHelper helper = new UpgradeHelper();
-                    helper.Upgrade("");
+                    Thread thread1 = new Thread(() =>
+                    {
+                        UpgradeHelper helper = new UpgradeHelper();
+                        helper.Upgrade("");
+                    });
+                    thread1.Start();
 
                     var data = Encoding.UTF8.GetBytes("Launched");
                     context.Response.OutputStream.Write(data, 0, data.Length);
