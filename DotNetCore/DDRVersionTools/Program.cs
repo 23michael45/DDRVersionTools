@@ -10,7 +10,7 @@ using LitJson;
 using ConfigurationParser;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-
+using System.Threading;
 namespace DDRVersionTools
 {
     public class Program
@@ -100,6 +100,13 @@ namespace DDRVersionTools
                     } while (!quit);
 
             }
+			else if (args[0] == "background")
+            {
+				do
+                {
+					Thread.Sleep(1000);
+                } while (true);	
+			}
         }
 
         //DDRVersionTools.exe compile-time Version.h 2
