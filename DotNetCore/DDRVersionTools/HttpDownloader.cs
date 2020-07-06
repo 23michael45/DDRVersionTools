@@ -217,48 +217,56 @@ namespace DDRVersionTools
 
         void webServer_ProcessRequest(object sender, ProcessRequestEventArgs args)
         {
-            string cmd = args.Request.Path;
-            if (cmd == "/ver")
+            try
             {
-                UpgradeHelper helper = new UpgradeHelper();
-                string baseVersion;
-                string latestVersion;
-                string[] vers;
-                string currentVersion;
-                helper.ShowVersion(out baseVersion, out latestVersion, out vers, out currentVersion);
+
+
+                string cmd = args.Request.Path;
+                if (cmd == "/ver")
+                {
+                    UpgradeHelper helper = new UpgradeHelper();
+                    string baseVersion;
+                    string latestVersion;
+                    string[] vers;
+                    string currentVersion;
+                    helper.ShowVersion(out baseVersion, out latestVersion, out vers, out currentVersion);
 
 
 
 
-                VersionJson json = new VersionJson();
-                json.baseVersion = baseVersion;
-                json.latestVersion = latestVersion;
-                json.vers = vers;
-                json.currentVersion = currentVersion;
+                    VersionJson json = new VersionJson();
+                    json.baseVersion = baseVersion;
+                    json.latestVersion = latestVersion;
+                    json.vers = vers;
+                    json.currentVersion = currentVersion;
 
-                string jsonString;
-                jsonString = JsonMapper.ToJson(json);
+                    string jsonString;
+                    jsonString = JsonMapper.ToJson(json);
 
-                var data = Encoding.UTF8.GetBytes(jsonString);
-                args.Response.BinaryWrite(data);
+                    var data = Encoding.UTF8.GetBytes(jsonString);
+                    args.Response.BinaryWrite(data);
+                }
+                else if (cmd == "/upgrade")
+                {
+
+                    UpgradeHelper helper = new UpgradeHelper();
+                    helper.Upgrade("");
+
+                    var data = Encoding.UTF8.GetBytes("Launched");
+                    args.Response.BinaryWrite(data);
+                }
+                else if (cmd == "/progress")
+                {
+                    string jsonString;
+                    jsonString = JsonMapper.ToJson(currentProgress);
+                    var data = Encoding.UTF8.GetBytes(jsonString);
+                    args.Response.BinaryWrite(data);
+                }
             }
-            else if (cmd == "/upgrade")
+            catch(Exception e)
             {
-                
-                UpgradeHelper helper = new UpgradeHelper();
-                helper.Upgrade("");
-
-                var data = Encoding.UTF8.GetBytes("Launched");
-                args.Response.BinaryWrite(data);
+                Console.WriteLine("Http Request Exception:" + e.Message);
             }
-            else if (cmd == "/progress")
-            {
-                string jsonString;
-                jsonString = JsonMapper.ToJson(currentProgress);
-                var data = Encoding.UTF8.GetBytes(jsonString);
-                args.Response.BinaryWrite(data);
-            }
-            
         }
 
         private void HandleRequest(object state)
