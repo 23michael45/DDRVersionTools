@@ -75,12 +75,12 @@ namespace DDRVersionTools
                     {
                         quit = true;
                     }
-                    else if (cmd.StartsWith("v"))
+                    else if (cmd != null && cmd.StartsWith("v"))
                     {
                         ShowVersion();
 
                     }
-                    else if (cmd.StartsWith("u"))
+                    else if (cmd != null && cmd.StartsWith("u"))
                     {
                         List<string> cmdargs = cmd.Split(' ').ToList();
                         if (cmdargs.Count < 2)
@@ -90,7 +90,7 @@ namespace DDRVersionTools
                         Upgrade(cmdargs[1]);
 
                     }
-                    else if (cmd.StartsWith("b"))
+                    else if (cmd != null && cmd.StartsWith("b"))
                     {
 
                         Console.Write("\n当前工具版本:" + Version.BuildTime);
