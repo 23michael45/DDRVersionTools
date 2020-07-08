@@ -274,7 +274,7 @@ namespace DDRVersionTools
                     }
                 };
 
-                server.EndPoint = new IPEndPoint(IPAddress.Loopback, 8081);
+                server.EndPoint = new IPEndPoint(IPAddress.Any, 8081);
 
                 server.Start();
 

@@ -50,9 +50,7 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
-  </PropertyGroup>
+  <PropertyGroup />
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -80,6 +78,32 @@
     <Compile Include="LitJson\Lexer.cs" />
     <Compile Include="LitJson\Netstandard15Polyfill.cs" />
     <Compile Include="LitJson\ParserToken.cs" />
+    <Compile Include="NHttp\HttpClient.cs" />
+    <Compile Include="NHttp\HttpContext.cs" />
+    <Compile Include="NHttp\HttpCookie.cs" />
+    <Compile Include="NHttp\HttpCookieCollection.cs" />
+    <Compile Include="NHttp\HttpExceptionEventHandler.cs" />
+    <Compile Include="NHttp\HttpFileCollection.cs" />
+    <Compile Include="NHttp\HttpMultiPartItem.cs" />
+    <Compile Include="NHttp\HttpMultiPartRequestParser.cs" />
+    <Compile Include="NHttp\HttpOutputStream.cs" />
+    <Compile Include="NHttp\HttpPostedFile.cs" />
+    <Compile Include="NHttp\HttpReadBuffer.cs" />
+    <Compile Include="NHttp\HttpRequest.cs" />
+    <Compile Include="NHttp\HttpRequestEventHandler.cs" />
+    <Compile Include="NHttp\HttpRequestParser.cs" />
+    <Compile Include="NHttp\HttpResponse.cs" />
+    <Compile Include="NHttp\HttpServer.cs" />
+    <Compile Include="NHttp\HttpServerState.cs" />
+    <Compile Include="NHttp\HttpServerUtility.cs" />
+    <Compile Include="NHttp\HttpTimeoutManager.cs" />
+    <Compile Include="NHttp\HttpUnknownRequestParser.cs" />
+    <Compile Include="NHttp\HttpUrlEncodedRequestParser.cs" />
+    <Compile Include="NHttp\HttpUtil.cs" />
+    <Compile Include="NHttp\ILog.cs" />
+    <Compile Include="NHttp\LogManager.cs" />
+    <Compile Include="NHttp\NHttpException.cs" />
+    <Compile Include="NHttp\ProtocolException.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TinyWeb\HttpRequest.cs" />
@@ -94,7 +118,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="app.manifest" />
+    <None Include="NHttp\.gitignore" />
+    <None Include="NHttp\Key.snk" />
+    <None Include="NHttp\NHttp.csproj" />
+    <None Include="NHttp\NHttp.nuspec" />
+    <None Include="NHttp\Pack NuGet Package.bat" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
@@ -102,6 +130,9 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="NHttp\Resources\InternalServerError.html" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
