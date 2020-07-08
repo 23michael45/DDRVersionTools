@@ -226,7 +226,7 @@ namespace DDRVersionTools
                     string cmd = e.Request.RawUrl;
 
 
-                    using (System.IO.BinaryWrier writer = new BinaryWrier(e.Response.OutputStream))
+                    using (System.IO.BinaryWriter writer = new BinaryWriter(e.Response.OutputStream))
                     {
 
                         if (cmd == "/ver")
