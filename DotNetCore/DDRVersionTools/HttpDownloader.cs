@@ -184,35 +184,35 @@ namespace DDRVersionTools
 
         void ThreadFunc()
         {
-            //listener = new HttpListener();
+            listener = new HttpListener();
 
-            ////listener.Prefixes.Add("http://+:8081/");
-            //listener.Prefixes.Add("http://localhost:8081/");
-            //listener.Prefixes.Add("http://127.0.0.1:8081/");
+            //listener.Prefixes.Add("http://+:8081/");
+            listener.Prefixes.Add("http://localhost:8081/");
+            listener.Prefixes.Add("http://127.0.0.1:8081/");
 
-            //listener.Start();
-            //while (working)
-            //{
-            //    try
-            //    {
-            //        var context = listener.GetContext();
-            //        ThreadPool.QueueUserWorkItem(o => HandleRequest(context));
-            //    }
-            //    catch (Exception)
-            //    {
-            //        // Ignored for this example
-            //    }
-            //}
+            listener.Start();
+            while (working)
+            {
+                try
+                {
+                    var context = listener.GetContext();
+                    ThreadPool.QueueUserWorkItem(o => HandleRequest(context));
+                }
+                catch (Exception)
+                {
+                    // Ignored for this example
+                }
+            }
 
-            //listener.Close();
+            listener.Close();
 
 
 
-            TinyWeb.WebServer webServer = new TinyWeb.WebServer();
+            //TinyWeb.WebServer webServer = new TinyWeb.WebServer();
 
-            webServer.EndPoint = new IPEndPoint(0, 8081);
-            webServer.ProcessRequest += new TinyWeb.ProcessRequestEventHandler(this.webServer_ProcessRequest);
-            webServer.IsStarted = true;
+            //webServer.EndPoint = new IPEndPoint(0, 8081);
+            //webServer.ProcessRequest += new TinyWeb.ProcessRequestEventHandler(this.webServer_ProcessRequest);
+            //webServer.IsStarted = true;
         }
 
         void webServer_ProcessRequest(object sender, ProcessRequestEventArgs args)
@@ -248,9 +248,12 @@ namespace DDRVersionTools
                 }
                 else if (cmd == "/upgrade")
                 {
-
-                    UpgradeHelper helper = new UpgradeHelper();
-                    helper.Upgrade("");
+                    Thread thread1 = new Thread(() =>
+                    {
+                        UpgradeHelper helper = new UpgradeHelper();
+                        helper.Upgrade("");
+                    });
+                    thread1.Start();
 
                     var data = Encoding.UTF8.GetBytes("Launched");
                     args.Response.BinaryWrite(data);
@@ -280,6 +283,7 @@ namespace DDRVersionTools
 
                 int totalTime = 0;
 
+                cmd = context.Request.RawUrl;
 
                 if(context.Request.RawUrl == "/ver")
                 {
@@ -313,6 +317,8 @@ namespace DDRVersionTools
                         helper.Upgrade("");
                     });
                     thread1.Start();
+
+
 
                     var data = Encoding.UTF8.GetBytes("Launched");
                     context.Response.OutputStream.Write(data, 0, data.Length);
