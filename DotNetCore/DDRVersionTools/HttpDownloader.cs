@@ -289,9 +289,9 @@ namespace DDRVersionTools
 
                         }
                     }
-                    catch (Exception e)
+                    catch (Exception ex)
                     {
-                        Console.WriteLine("Http Request Exception:" + e.Message);
+                        Console.WriteLine("Http Request Exception:" + ex.Message);
                     }
                 };
 
