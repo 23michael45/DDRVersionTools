@@ -223,7 +223,7 @@ namespace DDRVersionTools
                 {
                     // The response must be written to e.Response.OutputStream.
                     // When writing text, a StreamWriter can be used.
-                    string cmd = e.Request.Url;
+                    string cmd = e.Request.RawUrl;
 
 
                     using (System.IO.StreamWriter writer = new StreamWriter(e.Response.OutputStream))
