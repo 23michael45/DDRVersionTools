@@ -283,7 +283,7 @@ namespace DDRVersionTools
 
                 int totalTime = 0;
 
-                cmd = context.Request.RawUrl;
+                string cmd = context.Request.RawUrl;
 
                 if(context.Request.RawUrl == "/ver")
                 {
@@ -311,12 +311,12 @@ namespace DDRVersionTools
                 }
                 else if (context.Request.RawUrl == "/upgrade")
                 {
-                    Thread thread1 = new Thread(() =>
-                    {
-                        UpgradeHelper helper = new UpgradeHelper();
-                        helper.Upgrade("");
-                    });
-                    thread1.Start();
+                    //Thread thread1 = new Thread(() =>
+                    //{
+                    //    UpgradeHelper helper = new UpgradeHelper();
+                    //    helper.Upgrade("");
+                    //});
+                    //thread1.Start();
 
 
 
