@@ -168,8 +168,11 @@ namespace DDRVersionTools
 
         HttpListener listener;
         bool working = true;
+        
         public AsyncServer()
         {
+            
+
             Instance = this;
             Thread thread1 = new Thread(ThreadFunc);
             thread1.Start();
@@ -208,11 +211,75 @@ namespace DDRVersionTools
 
 
 
-            TinyWeb.WebServer webServer = new TinyWeb.WebServer();
+            //TinyWeb.WebServer webServer = new TinyWeb.WebServer();
 
-            webServer.EndPoint = new IPEndPoint(0, 8081);
-            webServer.ProcessRequest += new TinyWeb.ProcessRequestEventHandler(this.webServer_ProcessRequest);
-            webServer.IsStarted = true;
+            //webServer.EndPoint = new IPEndPoint(0, 8081);
+            //webServer.ProcessRequest += new TinyWeb.ProcessRequestEventHandler(this.webServer_ProcessRequest);
+            //webServer.IsStarted = true;
+
+            using (var server = new NHttp.HttpServer())
+            {
+                server.RequestReceived += (s, e) =>
+                {
+                    // The response must be written to e.Response.OutputStream.
+                    // When writing text, a StreamWriter can be used.
+                    string cmd = e.Request.Url;
+
+
+                    using (System.IO.StreamWriter writer = new StreamWriter(e.Response.OutputStream))
+                    {
+
+                        if (cmd == "/ver")
+                        {
+                            UpgradeHelper helper = new UpgradeHelper();
+                            string baseVersion;
+                            string latestVersion;
+                            string[] vers;
+                            string currentVersion;
+                            helper.ShowVersion(out baseVersion, out latestVersion, out vers, out currentVersion);
+
+                            
+                            VersionJson json = new VersionJson();
+                            json.baseVersion = baseVersion;
+                            json.latestVersion = latestVersion;
+                            json.vers = vers;
+                            json.currentVersion = currentVersion;
+
+                            string jsonString;
+                            jsonString = JsonMapper.ToJson(json);
+
+                            var data = Encoding.UTF8.GetBytes(jsonString);
+                            e.Response.BinaryWrite(data);
+                        }
+                        else if (cmd == "/upgrade")
+                        {
+                            Thread thread1 = new Thread(() =>
+                            {
+                                UpgradeHelper helper = new UpgradeHelper();
+                                helper.Upgrade("");
+                            });
+                            thread1.Start();
+
+                            var data = Encoding.UTF8.GetBytes("Launched");
+                            e.Response.BinaryWrite(data);
+                        }
+                        else if (cmd == "/progress")
+                        {
+                            string jsonString;
+                            jsonString = JsonMapper.ToJson(currentProgress);
+                            var data = Encoding.UTF8.GetBytes(jsonString);
+                            e.Response.BinaryWrite(data);
+                        }
+
+                    }
+                };
+
+                server.EndPoint = new IPEndPoint(IPAddress.Loopback, 8081);
+
+                server.Start();
+
+                // ...
+            }
         }
 
         void webServer_ProcessRequest(object sender, ProcessRequestEventArgs args)
