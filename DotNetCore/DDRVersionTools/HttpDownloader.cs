@@ -226,7 +226,7 @@ namespace DDRVersionTools
                     string cmd = e.Request.RawUrl;
 
 
-                    using (System.IO.StreamWriter writer = new StreamWriter(e.Response.OutputStream))
+                    using (System.IO.BinaryWrier writer = new BinaryWrier(e.Response.OutputStream))
                     {
 
                         if (cmd == "/ver")
@@ -249,7 +249,7 @@ namespace DDRVersionTools
                             jsonString = JsonMapper.ToJson(json);
 
                             var data = Encoding.UTF8.GetBytes(jsonString);
-                            e.Response.OutputStream.Write(data,0,data.Length);
+                            writer.Write(data,0,data.Length);
                         }
                         else if (cmd == "/upgrade")
                         {
@@ -261,14 +261,14 @@ namespace DDRVersionTools
                             thread1.Start();
 
                             var data = Encoding.UTF8.GetBytes("Launched");
-                            e.Response.OutputStream.Write(data, 0, data.Length);
+                            writer.Write(data, 0, data.Length);
                         }
                         else if (cmd == "/progress")
                         {
                             string jsonString;
                             jsonString = JsonMapper.ToJson(currentProgress);
                             var data = Encoding.UTF8.GetBytes(jsonString);
-                            e.Response.OutputStream.Write(data, 0, data.Length);
+                            writer.Write(data, 0, data.Length);
                         }
 
                     }
@@ -278,7 +278,7 @@ namespace DDRVersionTools
 
                 server.Start();
 
-                // ...
+                Console.ReadKey();
             }
         }
 
