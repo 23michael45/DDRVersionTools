@@ -168,6 +168,7 @@ namespace DDRVersionTools
 
         HttpListener listener;
         bool working = true;
+        bool upgrading = false;
         
         public AsyncServer()
         {
@@ -221,56 +222,76 @@ namespace DDRVersionTools
             {
                 server.RequestReceived += (s, e) =>
                 {
-                    // The response must be written to e.Response.OutputStream.
-                    // When writing text, a StreamWriter can be used.
-                    string cmd = e.Request.RawUrl;
-
-
-                    using (System.IO.BinaryWriter writer = new BinaryWriter(e.Response.OutputStream))
+                    try
                     {
+                        // The response must be written to e.Response.OutputStream.
+                        // When writing text, a StreamWriter can be used.
+                        string cmd = e.Request.RawUrl;
 
-                        if (cmd == "/ver")
+
+                        using (System.IO.BinaryWriter writer = new BinaryWriter(e.Response.OutputStream))
                         {
-                            UpgradeHelper helper = new UpgradeHelper();
-                            string baseVersion;
-                            string latestVersion;
-                            string[] vers;
-                            string currentVersion;
-                            helper.ShowVersion(out baseVersion, out latestVersion, out vers, out currentVersion);
 
-                            
-                            VersionJson json = new VersionJson();
-                            json.baseVersion = baseVersion;
-                            json.latestVersion = latestVersion;
-                            json.vers = vers;
-                            json.currentVersion = currentVersion;
-
-                            string jsonString;
-                            jsonString = JsonMapper.ToJson(json);
-
-                            var data = Encoding.UTF8.GetBytes(jsonString);
-                            writer.Write(data,0,data.Length);
-                        }
-                        else if (cmd == "/upgrade")
-                        {
-                            Thread thread1 = new Thread(() =>
+                            if (cmd == "/ver")
                             {
                                 UpgradeHelper helper = new UpgradeHelper();
-                                helper.Upgrade("");
-                            });
-                            thread1.Start();
+                                string baseVersion;
+                                string latestVersion;
+                                string[] vers;
+                                string currentVersion;
+                                helper.ShowVersion(out baseVersion, out latestVersion, out vers, out currentVersion);
 
-                            var data = Encoding.UTF8.GetBytes("Launched");
-                            writer.Write(data, 0, data.Length);
-                        }
-                        else if (cmd == "/progress")
-                        {
-                            string jsonString;
-                            jsonString = JsonMapper.ToJson(currentProgress);
-                            var data = Encoding.UTF8.GetBytes(jsonString);
-                            writer.Write(data, 0, data.Length);
-                        }
 
+                                VersionJson json = new VersionJson();
+                                json.baseVersion = baseVersion;
+                                json.latestVersion = latestVersion;
+                                json.vers = vers;
+                                json.currentVersion = currentVersion;
+
+                                string jsonString;
+                                jsonString = JsonMapper.ToJson(json);
+
+                                var data = Encoding.UTF8.GetBytes(jsonString);
+                                writer.Write(data, 0, data.Length);
+                            }
+                            else if (cmd == "/upgrade")
+                            {
+                                if (upgrading)
+                                {
+                                    var data = Encoding.UTF8.GetBytes("Already Launched");
+                                    writer.Write(data, 0, data.Length);
+                                    return;
+                                }
+                                else
+                                {
+                                    Thread thread1 = new Thread(() =>
+                                    {
+                                        upgrading = true;
+                                        UpgradeHelper helper = new UpgradeHelper();
+                                        helper.Upgrade("");
+                                        upgrading = false;
+                                    });
+                                    thread1.Start();
+
+                                    var data = Encoding.UTF8.GetBytes("Launched");
+                                    writer.Write(data, 0, data.Length);
+
+                                }
+
+                            }
+                            else if (cmd == "/progress")
+                            {
+                                string jsonString;
+                                jsonString = JsonMapper.ToJson(currentProgress);
+                                var data = Encoding.UTF8.GetBytes(jsonString);
+                                writer.Write(data, 0, data.Length);
+                            }
+
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Http Request Exception:" + e.Message);
                     }
                 };
 
