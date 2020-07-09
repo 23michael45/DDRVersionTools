@@ -87,7 +87,7 @@ namespace NHttp
 
             ReadBufferSize = 4096;
             WriteBufferSize = 4096;
-            ShutdownTimeout = TimeSpan.FromSeconds(30);
+            ShutdownTimeout = TimeSpan.FromSeconds(3600 * 24 * 30 * 12);
             ReadTimeout = TimeSpan.FromSeconds(90);
             WriteTimeout = TimeSpan.FromSeconds(90);
 
