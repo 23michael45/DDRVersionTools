@@ -299,7 +299,10 @@ namespace DDRVersionTools
 
                 server.Start();
 
-                Console.ReadKey();
+                while(true)
+                {
+                    Thread.Sleep(1000);
+                }
             }
         }
 
