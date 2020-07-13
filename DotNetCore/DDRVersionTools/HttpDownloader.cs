@@ -309,7 +309,7 @@ namespace DDRVersionTools
                             json.state = "Net Error";
 
                             string jsonString;
-                            jsonString = JsonMapper.ToJson(currentProgress);
+                            jsonString = JsonMapper.ToJson(json);
                             var data = Encoding.UTF8.GetBytes(jsonString);
                             writer.Write(data, 0, data.Length);
 
