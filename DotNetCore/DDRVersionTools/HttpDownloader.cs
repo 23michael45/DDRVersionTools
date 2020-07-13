@@ -257,6 +257,7 @@ namespace DDRVersionTools
                                 json.latestVersion = latestVersion;
                                 json.vers = vers;
                                 json.currentVersion = currentVersion;
+                                json.state = "success";
 
                                 string jsonString;
                                 jsonString = JsonMapper.ToJson(json);
@@ -270,7 +271,7 @@ namespace DDRVersionTools
                                 StateJson json = new StateJson();
                                 if (upgrading)
                                 {
-                                    json.state = "Already Launched";
+                                    json.state = "already launched";
 
 
                                 }
@@ -285,7 +286,7 @@ namespace DDRVersionTools
                                     });
                                     thread1.Start();
 
-                                    json.state = "Launched";
+                                    json.state = "success";
 
                                 }
 
@@ -298,6 +299,7 @@ namespace DDRVersionTools
                             else if (cmd == "/progress")
                             {
                                 string jsonString;
+                                currentProgress.state = "success";
                                 jsonString = JsonMapper.ToJson(currentProgress);
                                 var data = Encoding.UTF8.GetBytes(jsonString);
                                 writer.Write(data, 0, data.Length);
@@ -312,19 +314,19 @@ namespace DDRVersionTools
                             if (cmd == "/ver")
                             {
                                 VersionJson json = new VersionJson();
-                                json.state = "Net Error";
+                                json.state = "net error";
                                 jsonString = JsonMapper.ToJson(json);
                             }
                             else if (cmd == "/upgrade")
                             {
                                 StateJson json = new StateJson();
-                                json.state = "Net Error";
+                                json.state = "net error";
                                 jsonString = JsonMapper.ToJson(json);
                             }
                             else if (cmd == "/progress")
                             {
                                 ProgressJson json = new ProgressJson();
-                                json.state = "Net Error";
+                                json.state = "net error";
                                 jsonString = JsonMapper.ToJson(json);
 
                             }
