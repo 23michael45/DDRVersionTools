@@ -308,7 +308,7 @@ namespace DDRVersionTools
                         {
                             AsyncServer.Instance.SetProgress("Idle", 0);
 
-                            string jsonString;
+                            string jsonString = "";
                             if (cmd == "/ver")
                             {
                                 VersionJson json = new VersionJson();
