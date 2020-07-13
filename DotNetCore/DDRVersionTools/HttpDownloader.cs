@@ -225,15 +225,16 @@ namespace DDRVersionTools
             {
                 server.RequestReceived += (s, e) =>
                 {
-                    try
+                    using (System.IO.BinaryWriter writer = new BinaryWriter(e.Response.OutputStream))
                     {
-                        // The response must be written to e.Response.OutputStream.
-                        // When writing text, a StreamWriter can be used.
-                        string cmd = e.Request.RawUrl;
-
-
-                        using (System.IO.BinaryWriter writer = new BinaryWriter(e.Response.OutputStream))
+                        try
                         {
+                            // The response must be written to e.Response.OutputStream.
+                            // When writing text, a StreamWriter can be used.
+                            string cmd = e.Request.RawUrl;
+
+
+
 
                             if (cmd == "/ver")
                             {
@@ -265,7 +266,7 @@ namespace DDRVersionTools
                                 {
                                     json.state = "Already Launched";
 
-                           
+
                                 }
                                 else
                                 {
@@ -286,7 +287,7 @@ namespace DDRVersionTools
                                 jsonString = JsonMapper.ToJson(json);
                                 var data = Encoding.UTF8.GetBytes(jsonString);
                                 writer.Write(data, 0, data.Length);
-                          
+
                             }
                             else if (cmd == "/progress")
                             {
@@ -297,23 +298,23 @@ namespace DDRVersionTools
                             }
 
                         }
-                    }
-                    catch (Exception ex)
-                    {
+                        catch (Exception ex)
+                        {
 
 
-                        AsyncServer.Instance.SetProgress("Idle", 0);
+                            AsyncServer.Instance.SetProgress("Idle", 0);
 
 
-                        StateJson json = new StateJson();
-                        json.state = "Net Error";
+                            StateJson json = new StateJson();
+                            json.state = "Net Error";
 
-                        string jsonString;
-                        jsonString = JsonMapper.ToJson(currentProgress);
-                        var data = Encoding.UTF8.GetBytes(jsonString);
-                        writer.Write(data, 0, data.Length);
+                            string jsonString;
+                            jsonString = JsonMapper.ToJson(currentProgress);
+                            var data = Encoding.UTF8.GetBytes(jsonString);
+                            writer.Write(data, 0, data.Length);
 
-                        Console.WriteLine("Http Request Exception:" + ex.Message);
+                            Console.WriteLine("Http Request Exception:" + ex.Message);
+                        }
                     }
                 };
 
