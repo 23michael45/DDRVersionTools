@@ -599,21 +599,45 @@ namespace DDRVersionTools
 
                 bool ret = true;
                 ret = FillCurList();
-                if (!ret) return;
+                if (!ret)
+                {
+                    AsyncServer.Instance.SetProgress("Idle", 0);
+                    return;
+                }
 
 
                 ret = DownloadVersionFiles(version);
-                if (!ret) return;
+                if (!ret)
+                {
+                    AsyncServer.Instance.SetProgress("Idle", 0);
+                    return;
+                }
 
 
                 ret = DownloadLargeFiles();
-                if (!ret) return;
+                if (!ret)
+                {
+                    AsyncServer.Instance.SetProgress("Idle", 0);
+                    return;
+                }
                 ret = DownloadSeqFilesAndRun();
-                if (!ret) return;
+                if (!ret)
+                {
+                    AsyncServer.Instance.SetProgress("Idle", 0);
+                    return;
+                }
                 ret = DeleteUnusedFiles();
-                if (!ret) return;
+                if (!ret)
+                {
+                    AsyncServer.Instance.SetProgress("Idle", 0);
+                    return;
+                }
                 ret = WriteNewVersion(version);
-                if (!ret) return;
+                if (!ret)
+                {
+                    AsyncServer.Instance.SetProgress("Idle", 0);
+                    return;
+                }
 
                 AsyncServer.Instance.SetProgress("Idle", 0);
 
