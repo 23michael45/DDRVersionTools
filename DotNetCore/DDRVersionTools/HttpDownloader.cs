@@ -232,13 +232,14 @@ namespace DDRVersionTools
                 {
                     using (System.IO.BinaryWriter writer = new BinaryWriter(e.Response.OutputStream))
                     {
+                        string cmd = e.Request.RawUrl;
+
+
                         try
                         {
                             // The response must be written to e.Response.OutputStream.
                             // When writing text, a StreamWriter can be used.
-                            string cmd = e.Request.RawUrl;
-
-
+                           
 
 
                             if (cmd == "/ver")
