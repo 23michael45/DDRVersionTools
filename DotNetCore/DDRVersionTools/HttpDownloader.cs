@@ -146,6 +146,9 @@ namespace DDRVersionTools
             public string latestVersion { get; set; }
             public string[] vers { get; set; }
             public string currentVersion { get; set; }
+
+
+            public string state { get; set; }
         }
         public class StateJson
         {
@@ -157,6 +160,8 @@ namespace DDRVersionTools
 
             public string ProgressName { get; set; }
             public double Progress { get; set; }
+
+            public string state { get; set; }
         }
         ProgressJson currentProgress = new ProgressJson();
 
@@ -300,16 +305,29 @@ namespace DDRVersionTools
                         }
                         catch (Exception ex)
                         {
-
-
                             AsyncServer.Instance.SetProgress("Idle", 0);
 
-
-                            StateJson json = new StateJson();
-                            json.state = "Net Error";
-
                             string jsonString;
-                            jsonString = JsonMapper.ToJson(json);
+                            if (cmd == "/ver")
+                            {
+                                VersionJson json = new VersionJson();
+                                json.state = "Net Error";
+                                jsonString = JsonMapper.ToJson(json);
+                            }
+                            else if (cmd == "/upgrade")
+                            {
+                                StateJson json = new StateJson();
+                                json.state = "Net Error";
+                                jsonString = JsonMapper.ToJson(json);
+                            }
+                            else if (cmd == "/progress")
+                            {
+                                ProgressJson json = new ProgressJson();
+                                json.state = "Net Error";
+                                jsonString = JsonMapper.ToJson(json);
+
+                            }
+
                             var data = Encoding.UTF8.GetBytes(jsonString);
                             writer.Write(data, 0, data.Length);
 
