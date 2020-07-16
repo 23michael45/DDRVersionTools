@@ -503,11 +503,13 @@ namespace DDRVersionTools
 
         bool DeleteUnusedFiles()
         {
+            string curFile = "";
             try
             {
                 Console.WriteLine("\n正在删除多除文件");
                 foreach (string curF in m_CurFileList)
                 {
+                    curFile = curF;
                     if (m_BaseFileList.Contains(curF))
                     {
                         continue;
@@ -530,7 +532,7 @@ namespace DDRVersionTools
 
                         File.Delete(curF);
 
-                        Console.WriteLine("\nDelete File:" + curF);
+                        Console.WriteLine("\nDelete File:" + curFile);
                     }
                 }
                 return true;
@@ -538,6 +540,7 @@ namespace DDRVersionTools
             catch (Exception e)
             {
 
+                Console.WriteLine("\nDelete UnusedFiles Error");
                 return false;
             }
 
@@ -555,6 +558,7 @@ namespace DDRVersionTools
             catch (Exception e)
             {
 
+                Console.WriteLine("\nWriteNewVersion Error");
                 return false;
 
             }
