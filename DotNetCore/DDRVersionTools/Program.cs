@@ -56,48 +56,59 @@ namespace DDRVersionTools
             }
             else if (args[0] == "cmdline")
             {
+
                 bool quit = false;
                 do
                 {
-                    Console.WriteLine("\nDDR版本更新工具v1.0");
-                    Console.WriteLine("\n----------------------------------------------------------------------------------------------------------------------");
-                    Console.WriteLine("----------------------------------------------------------------------------------------------------------------------");
-                    Console.WriteLine("请输入指令:");
-                    Console.WriteLine("   v                                     显示当前版本 最新版本及可升级版本");
-                    Console.WriteLine("   u [ver]                               升级到版本ver  ver为空则升级到最新版本");
-                    Console.WriteLine("   b                                     查看工具版本");
 
-                    Console.WriteLine("   quit                                  退出");
-
-
-                    string cmd = Console.ReadLine();
-                    if (cmd == "quit")
+                    try
                     {
-                        quit = true;
-                    }
-                    else if (cmd != null && cmd.StartsWith("v"))
-                    {
-                        ShowVersion();
 
-                    }
-                    else if (cmd != null && cmd.StartsWith("u"))
-                    {
-                        List<string> cmdargs = cmd.Split(' ').ToList();
-                        if (cmdargs.Count < 2)
+                        Console.WriteLine("\nDDR版本更新工具v1.0");
+                        Console.WriteLine("\n----------------------------------------------------------------------------------------------------------------------");
+                        Console.WriteLine("----------------------------------------------------------------------------------------------------------------------");
+                        Console.WriteLine("请输入指令:");
+                        Console.WriteLine("   v                                     显示当前版本 最新版本及可升级版本");
+                        Console.WriteLine("   u [ver]                               升级到版本ver  ver为空则升级到最新版本");
+                        Console.WriteLine("   b                                     查看工具版本");
+
+                        Console.WriteLine("   quit                                  退出");
+
+
+                        string cmd = Console.ReadLine();
+                        if (cmd == "quit")
                         {
-                            cmdargs.Add("");
+                            quit = true;
                         }
-                        Upgrade(cmdargs[1]);
+                        else if (cmd != null && cmd.StartsWith("v"))
+                        {
+                            ShowVersion();
 
+                        }
+                        else if (cmd != null && cmd.StartsWith("u"))
+                        {
+                            List<string> cmdargs = cmd.Split(' ').ToList();
+                            if (cmdargs.Count < 2)
+                            {
+                                cmdargs.Add("");
+                            }
+                            Upgrade(cmdargs[1]);
+
+                        }
+                        else if (cmd != null && cmd.StartsWith("b"))
+                        {
+
+                            Console.Write("\n当前工具版本:" + Version.BuildTime);
+                        }
                     }
-                    else if (cmd != null && cmd.StartsWith("b"))
+                    catch (Exception e)
                     {
-
-                        Console.Write("\n当前工具版本:" + Version.BuildTime);
+                        Console.Write("\nLoop Error");
                     }
 
+                
+                } while (!quit);
 
-                    } while (!quit);
 
             }
 			else if (args[0] == "background")
