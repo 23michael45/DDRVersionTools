@@ -580,7 +580,7 @@ namespace DDRVersionTools
             cmd.StandardInput.Flush();
             cmd.StandardInput.Close();
             cmd.WaitForExit();
-            Console.WriteLine(cmd.StandardOutput.ReadToEnd());
+            Console.WriteLine("RunCmd:"+ cmdinput);
         }
 
 
