@@ -540,7 +540,7 @@ namespace DDRVersionTools
             catch (Exception e)
             {
 
-                Console.WriteLine("\nDelete UnusedFiles Error");
+                Console.WriteLine("\nDelete UnusedFiles Error" + curFile);
                 return false;
             }
 
