@@ -268,6 +268,9 @@ namespace DDRVersionTools
                             else if (cmd == "/upgrade")
                             {
 
+                                string progressName = "\nu准备升级";
+                                AsyncServer.Instance.SetProgress(progressName, 0);
+
                                 StateJson json = new StateJson();
                                 if (upgrading)
                                 {
