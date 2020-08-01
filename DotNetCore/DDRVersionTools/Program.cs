@@ -64,7 +64,8 @@ namespace DDRVersionTools
                     try
                     {
 
-                        Console.WriteLine("\nDDR版本更新工具v1.0");
+                        Console.WriteLine("\nDDR版本更新工具");
+                        Console.WriteLine("\n当前工具版本:" + Version.BuildTime);
                         Console.WriteLine("\n----------------------------------------------------------------------------------------------------------------------");
                         Console.WriteLine("----------------------------------------------------------------------------------------------------------------------");
                         Console.WriteLine("请输入指令:");

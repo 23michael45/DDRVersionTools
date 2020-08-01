@@ -665,6 +665,13 @@ namespace DDRVersionTools
 
         public void ShowVersion(out string baseVersion,out string latestVersion,out string[] vers,out string currentVersion)
         {
+#if Linux
+            RunCmd("./PreShowVersion.sh");
+#else
+            RunCmd("PreShowVersion.bat");
+#endif
+
+
             string url = m_HttpAddr + "/" + m_AppName + "/" + m_DebugMode + @".txt";
             using (var client = new WebClient())
             {
